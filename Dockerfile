@@ -1,7 +1,7 @@
 ## Maintainer Christopher Lock <joutcast@gmail.com> v0.001-Z
 ##FREEPBX-CloudMagic AWS ELASTICACHE & BUILT AS A CONTAINER SERVICE
 MAINTAINER Christopher Lock <joutcast@gmail.com> v0.001-Z
-FROM alpine:3.5.2
+FROM alpine:3.5.3
 CMD ["/sbin/my_init"]
 ##SIP PORTS
 EXPOSE 10000-20000/udp
