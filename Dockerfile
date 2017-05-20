@@ -54,12 +54,12 @@ CMD var Memcached = require('elasticache-client');
 CMD var prompt = require('prompt')
   prompt.start();
   prompt.get(new Memcached['Server Locations', 'config', 'options'], function (err, result) {
-    memcached.log('Command-line input received:');
-    memcached.log('  Server locations: ' + result.Server locations);
-    memcached.log('  config: ' + result.config);
-    memcached.log('  options: ' + result.options);
-  });
-CMD var memcached = new Memcached(result.Server locations, result.config, result.options) 
+    console.log('Command-line input received:');
+    console.log('  Server locations: ' + result.Server locations);
+    console.log('  config: ' + result.config);
+    console.log('  options: ' + result.options);
+CMD var memcached = new Memcached(Server locations, config, options); 
+});
 
 
 ##INSTALL ASTERISK
