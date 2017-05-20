@@ -46,6 +46,7 @@ RUN /usr/bin/mysqladmin -u root password 'passw0rd'
 ##INSTALL DEPENDENCY CHILD OBJECTS
 CMD npm install node.js
 CMD npm install elasticache-client
+CMD npm install prompt
 ##OPTINAL CMD npm install aws-serverless-express
 
 ##AWS ELASTICACHE CONFIG
