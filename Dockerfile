@@ -1,7 +1,22 @@
 ## Maintainer Christopher Lock <joutcast@gmail.com> v0.001-Z
-##Incredibly Elastix docker file
+##FREEPBX-CloudMagic AWS ELASTICACHE & BUILT AS A CONTAINER SERVICE
 MAINTAINER Christopher Lock <joutcast@gmail.com> v0.001-Z
 FROM alpine:3.5.2
+CMD ["/sbin/my_init"]
+##SIP PORTS
+EXPOSE 10000-20000/udp
+Expose 5060/udp
+EXPOSE 5061/tcp
+EXPOSE 5061/UDP
+##YOU NEED TO ASK?....REALLY?
+Expose 80
+Expose 8088
+##GOOGLE VOICE CONNECTIONS
+EXPOSE 19302-19309/UDP
+EXPOSE 19302-19309/TCP
+
+##SET WORKING DIR
+WORKDIR /root/
 
 ##LIGHTTPD AND PHP INSTALL
 RUN apk add --no-cache lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi
@@ -67,6 +82,7 @@ RUN /bin/sh cd /var/www/localhost/htdocs/freepbx/admin/modules/framework/bin/
 RUN patch -p0 freepbx_engine.patch
 
 ##DOWNLOAD & INSTALL AWS ELASTICACHE
+##RUN /bin/sh wget https://elasticache-downloads.s3.amazonaws.com/ClusterClient/PHP-7.0/latest-64bit
 
 
 ##START PORTAL & SERVICES
