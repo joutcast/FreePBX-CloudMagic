@@ -1,7 +1,7 @@
 ## Maintainer Christopher Lock <joutcast@gmail.com> v0.001-Z
 ##FREEPBX-CloudMagic AWS ELASTICACHE & BUILT AS A CONTAINER SERVICE
 MAINTAINER Christopher Lock <joutcast@gmail.com> v0.001-Z
-FROM alpine:3.5.3
+FROM alpine:3.5-slim
 CMD ["/sbin/my_init"]
 ##SIP PORTS
 EXPOSE 10000-20000/udp
@@ -17,6 +17,9 @@ EXPOSE 19302-19309/TCP
 
 ##SET WORKING DIR
 WORKDIR /root/
+
+##UPDATE APK REPO
+CMD apk update -y
 
 ##INSTALL CORE DEPENDENCIES 
 RUN apk add --no-cache wget build-essential ssh python
