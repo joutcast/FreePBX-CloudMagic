@@ -16,38 +16,61 @@ EXPOSE 19302-19309/UDP
 EXPOSE 19302-19309/TCP
 
 ##SET WORKING DIR
-WORKDIR /root/
+WORKDIR /root
+RUN apk add --no-cache wget bash build-essentials
+
+#MAKE WORKING DIRECTORIES
+CMD mkdir /webcore-parts
+WORKDIR /webcore-parts
+COPY . /webcore-parts
 
 ##UPDATE APK REPO
 CMD apk update -y
 
-##INSTALL CORE DEPENDENCIES WGET BUILD-ESSENTIALS SSH AND OTHER BASIC BUILDING BLOCKS
-RUN apk add --no-cache wget build-essential ssh python dumb-init bash ca-certificates python3.4 npm
-
+##INSTALL BASIC SERVICES 
+RUN apk add --no-cache --virtual ssh python dumb-init ca-certificates python3.4 npm \
+  
 ##INSTALL CORE DEPENDENCIES LIGHTTPD AND PHP
-RUN apk add --no-cache lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi
-RUN apk add --no-cache php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom
+RUN apk add --no-cache --virtual lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi \
+RUN apk add --no-cache --virtual php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom \
 
-##CONFIGURE CORE DEPENDENCIES
+"##CONFIGURE CORE DEPENDENCIES"
 CMD "sed -i '/^#.* include "mod_fastcgi.conf" /s/^#//' /etc/lighttpd/lighttpd.conf"
 
 CMD rc-service lighttpd start && rc-update add lighttpd default
 
+CMD rc-service lighttpd stop
+
+CMD ["webcore-parts", "start"]
+
+##NEXT WORKING DIRECTORY FOR DB PARTs
+CMD mkdir /database-parts
+WORKDIR /database-parts
+COPY . /database-parts
+
 ##INSTALL CORE DEPENDENCIES PEAR
-RUN apk add --no-cache php5-pear; pear install DB
+RUN apk add --no-cache --virtual php5-pear; pear install DB \
 
-##INSTALL CORE DEPENDENCIES MYSQL-CLIENT
-RUN apk add --no-cache mysql mysql-client
+"##INSTALL CORE DEPENDENCIES MYSQL-CLIENT"
+RUN apk add --no-cache --virtual mysql mysql-client \
 
-##CONFIGURE CORE DEPENDENCY MYSQL-CLIENT
+"##CONFIGURE CORE DEPENDENCY MYSQL-CLIENT"
 RUN /usr/bin/mysql_install_db --user=mysql
 RUN /usr/bin/mysqladmin -u root password 'passw0rd'
+
+##CREATE NEXT APP GROUP
+CMD ["database-parts", "start"]
+
+##NEXT WORKING DIRECTORY NPM parts
+CMD mkdir /npm-parts
+WORKDIR /npm-parts
+COPY . /npm-parts
 
 ##INSTALL DEPENDENCY CHILD OBJECTS
 CMD npm install node.js
 CMD npm install elasticache-client
 CMD npm install prompt
-##OPTINAL CMD npm install aws-serverless-express
+CMD npm install aws-serverless-express
 
 ##AWS ELASTICACHE CONFIG
 CMD var Memcached = require('elasticache-client');
@@ -61,12 +84,24 @@ CMD var prompt = require('prompt')
 CMD var memcached = new Memcached(Server locations, config, options); 
 });
 
+##CREATE NEXT APP GROUP
+CMD ["npm-parts", "start"]
+
+##NEXT WORKING DIRECTORY PBX PARTS
+CMD mkdir /asterisk-parts
+WORKDIR /asterisk-parts
+COPY . /asterisk-parts
 
 ##INSTALL ASTERISK
-RUN apk add --no-cache asterisk asterisk-sample-config dahdi-linux-vserver asterisk-addons-mysql
+RUN apk add --no-cache --virtual asterisk asterisk-sample-config dahdi-linux-vserver asterisk-addons-mysql
 
 ##START ASTERISK
-CMD asterisk start
+CMD ["asterisk-parts", "start"]
+
+##NEXT WORKING DIRECTORY PBX PARTS
+CMD mkdir /pbx-parts
+WORKDIR /pbx-parts
+COPY . /pbx-parts
 
 ##INSTALL FREEPBX
 CMD wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-13.0-latest.tgz
@@ -81,13 +116,13 @@ CMD mysql -uroot -ppassw0rd GRANT ALL PRIVILEGES ON asterisk.* TO asteriskuser@l
 CMD mysql -uroot -ppassw0rd GRANT ALL PRIVILEGES ON asteriskcdrdb.* TO asteriskuser@localhost IDENTIFIED BY 'amp109'; exit
 
 ##ADD SED patch
-RUN apk add --no-cache sed patch
+RUN apk add --no-cache --virtual sed patch
 
 ##INSTALL PERL FOR FPO
-RUN apk add --no-cache apk add perl
+RUN apk add --no-cache --virtual apk add perl
 
 ##RUN INSTALLER
-CMD ./install_amp
+CMD ./install_amp --virtual
 
 ##CHANGE GROUPNAME & USERNAME 'lighttpd' TO 'asterisk'
 CMD groupmod --new-name asterisk lighttpd
@@ -107,11 +142,11 @@ CMD patch -p0 < freepbx_engine.patch
 RUN /bin/sh cd /var/www/localhost/htdocs/freepbx/admin/modules/framework/bin/
 CMD patch -p0 freepbx_engine.patch
 
+##FINAL GROUP
+["pbx-parts", "start"]
+
 ##DOWNLOAD & INSTALL AWS ELASTICACHE
 ##RUN /bin/sh wget https://elasticache-downloads.s3.amazonaws.com/ClusterClient/PHP-7.0/latest-64bit
-
-##INSTALL NPM & NODE.JS
-RUN apk add --no-cache --virtual 
 
 ##START PORTAL & SERVICES
 CMD amportal start
