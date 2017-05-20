@@ -21,26 +21,45 @@ WORKDIR /root/
 ##UPDATE APK REPO
 CMD apk update -y
 
-##INSTALL CORE DEPENDENCIES 
-RUN apk add --no-cache wget build-essential ssh python
+##INSTALL CORE DEPENDENCIES WGET BUILD-ESSENTIALS SSH AND OTHER BASIC BUILDING BLOCKS
+RUN apk add --no-cache wget build-essential ssh python dumb-init bash ca-certificates python3.4 npm
 
-##LIGHTTPD AND PHP INSTALL
+##INSTALL CORE DEPENDENCIES LIGHTTPD AND PHP
 RUN apk add --no-cache lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi
 RUN apk add --no-cache php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom
 
+##CONFIGURE CORE DEPENDENCIES
 CMD "sed -i '/^#.* include "mod_fastcgi.conf" /s/^#//' /etc/lighttpd/lighttpd.conf"
 
 CMD rc-service lighttpd start && rc-update add lighttpd default
 
-##INSTALL PEAR DB
+##INSTALL CORE DEPENDENCIES PEAR
 RUN apk add --no-cache php5-pear; pear install DB
 
-##INSTALL MYSQL CLIENT
+##INSTALL CORE DEPENDENCIES MYSQL-CLIENT
 RUN apk add --no-cache mysql mysql-client
 
-##START MYSQL MYSQL-CLIENT
+##CONFIGURE CORE DEPENDENCY MYSQL-CLIENT
 RUN /usr/bin/mysql_install_db --user=mysql
 RUN /usr/bin/mysqladmin -u root password 'passw0rd'
+
+##INSTALL DEPENDENCY CHILD OBJECTS
+CMD npm install node.js
+CMD npm install elasticache-client
+##OPTINAL CMD npm install aws-serverless-express
+
+##AWS ELASTICACHE CONFIG
+CMD var Memcached = require('elasticache-client');
+CMD var prompt = require('prompt')
+  prompt.start();
+  prompt.get(new Memcached['Server Locations', 'config', 'options'], function (err, result) {
+    memcached.log('Command-line input received:');
+    memcached.log('  Server locations: ' + result.Server locations);
+    memcached.log('  config: ' + result.config);
+    memcached.log('  options: ' + result.options);
+  });
+CMD var memcached = new Memcached(result.Server locations, result.config, result.options) 
+
 
 ##INSTALL ASTERISK
 RUN apk add --no-cache asterisk asterisk-sample-config dahdi-linux-vserver asterisk-addons-mysql
@@ -67,7 +86,7 @@ RUN apk add --no-cache sed patch
 RUN apk add --no-cache apk add perl
 
 ##RUN INSTALLER
-CMD ./install_amp -y
+CMD ./install_amp
 
 ##CHANGE GROUPNAME & USERNAME 'lighttpd' TO 'asterisk'
 CMD groupmod --new-name asterisk lighttpd
@@ -90,6 +109,8 @@ CMD patch -p0 freepbx_engine.patch
 ##DOWNLOAD & INSTALL AWS ELASTICACHE
 ##RUN /bin/sh wget https://elasticache-downloads.s3.amazonaws.com/ClusterClient/PHP-7.0/latest-64bit
 
+##INSTALL NPM & NODE.JS
+RUN apk add --no-cache --virtual 
 
 ##START PORTAL & SERVICES
 CMD amportal start
