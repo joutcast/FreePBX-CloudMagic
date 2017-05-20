@@ -1,18 +1,16 @@
-#!/bin/bash
-
 #START LIGHTTPD & PHP
---init lighttpd
+dumb-init lighttpd
 
 # start apache
---init apache2 start
+dumb-init apache2 start
 
 # start mysql
 /etc/init.d/mysql start
---init mariadb default
+dumb-init mariadb default
 
 # start asterisk
---init asterisk start
+dumb-init asterisk start
 
 #START FREEPBX v.13
---init amportal start
---init fwconsole start
+dumb-init amportal start
+dumb-init fwconsole start
