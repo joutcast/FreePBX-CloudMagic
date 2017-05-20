@@ -1,13 +1,13 @@
 ## Maintainer Christopher Lock <joutcast@gmail.com> v0.001-Z
 ##Incredibly Elastix docker file
 MAINTAINER Christopher Lock <joutcast@gmail.com> v0.001-Z
-FROM alpine:3.5
+FROM alpine:3.5.2
 
 ##LIGHTTPD AND PHP INSTALL
 RUN apk add --no-cache lighttpd php5-common php5-iconv php5-json php5-gd php5-curl php5-xml php5-pgsql php5-imap php5-cgi fcgi
 RUN apk add --no-cache php5-pdo php5-pdo_pgsql php5-soap php5-xmlrpc php5-posix php5-mcrypt php5-gettext php5-ldap php5-ctype php5-dom
 
-RUN /bin/sh sed -i '/^#.* include "mod_fastcgi.conf" /s/^#//' /etc/lighttpd/lighttpd.conf
+RUN /bin/sh "sed -i '/^#.* include "mod_fastcgi.conf" /s/^#//' /etc/lighttpd/lighttpd.conf"
 
 RUN /bin/sh rc-service lighttpd start && rc-update add lighttpd default
 
@@ -65,6 +65,9 @@ RUN /bin/sh cd /var/lib/asterisk/bin
 RUN patch -p0 < freepbx_engine.patch
 RUN /bin/sh cd /var/www/localhost/htdocs/freepbx/admin/modules/framework/bin/
 RUN patch -p0 freepbx_engine.patch
+
+##DOWNLOAD & INSTALL AWS ELASTICACHE
+
 
 ##START PORTAL & SERVICES
 RUN /bin/sh amportal start
