@@ -218,5 +218,4 @@ CMD ["npm-parts", "start"]
 CMD ["asterisk-parts", "start"]
 
 ##PORTAL START
-CMD amportal start
 CMD fwconsole start
