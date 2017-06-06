@@ -1,0 +1,14 @@
+version: '3'
+services:
+  freepbx-cloudmagic:
+    build: .
+    depends_on:
+      - openrc-parts
+      - webcore-parts
+      - database-parts
+      - npm-parts
+      - asterisk-parts
+  freepbx:
+    image: freepbx
+  db:
+    image: mariadb
