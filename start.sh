@@ -1,16 +1,21 @@
+#START OPENRC
+dumb-init openrc
+
 #START LIGHTTPD & PHP
 dumb-init lighttpd
 
-# start apache
+#START APACHE
 dumb-init apache2 start
 
+#START NPM
+dumb-init npm
+
 # start mysql
-/etc/init.d/mysql start
+dumb-init mysql start
 dumb-init mariadb default
 
 # start asterisk
 dumb-init asterisk start
 
 #START FREEPBX v.13
-dumb-init amportal start
-dumb-init fwconsole start
+CMD fwconsole start
