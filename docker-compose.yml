@@ -16,8 +16,7 @@ services:
   container_name: lighttpd
   ports:
    - "80"
-  depends:
-   - "mysql:mysql" "mysql:mysql-admin"
+ 
      asterisk:  
   image: andrius/alpine-asterisk
   container_name: asterisk
@@ -30,8 +29,7 @@ services:
   environment:
    - ASTERISK_USER=admin
    - ASTERISK_PW=passw0rd
-  depends:
-   - "lighttpd:lighttpd" "mysql:mysql" "mysql:mysql-admin"
+ 
   freepbx:
   build: ./FreePBX-CloudMagic
   container_name: freepbx
