@@ -35,8 +35,8 @@ services:
   environment:
    - ASTERISK_USER=admin
    - ASTERISK_PW=passw0rd
-  freepbx:
-  build: ./FreePBX-CloudMagic
+  FreePBX-CloudMagic:
+  build: ./freepbx
   container_name: freepbx
   depends_on:
    - mysql
