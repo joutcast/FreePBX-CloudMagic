@@ -1,14 +1,45 @@
 version: '3'
 services:
-  freepbx-cloudmagic:
-    build: .
-    depends_on:
-      - openrc-parts
-      - webcore-parts
-      - database-parts
-      - npm-parts
-      - asterisk-parts
+  mysql:  
+  image: wangxian/alpine-mysql
+  container_name: mysql
+  ports:
+   - "3306"
+  environment:
+   - MYSQL_ROOT_PASSWORD=root
+   - MYSQL_DATABASE=asteriskcddb
+   - MYSQL_DATABASE=asterisk
+   - MYSQL_USER=admin
+   - MYSQL_PASSWORD=passw0rd
+     lighttpd:  
+  image: alexac/alpine-lighttpd
+  container_name: lighttpd
+  ports:
+   - "80"
+  depends:
+   - "mysql:mysql" "mysql:mysql-admin"
+     asterisk:  
+  image: andrius/alpine-asterisk
+  container_name: asterisk
+  ports:
+   - "3306"
+   - "80"
+   - "5060-5070"
+   - "10000-20000"
+   - "19302-19309"
+  environment:
+   - ASTERISK_USER=admin
+   - ASTERISK_PW=passw0rd
+  depends:
+   - "lighttpd:lighttpd" "mysql:mysql" "mysql:mysql-admin"
   freepbx:
-    image: freepbx
-  db:
-    image: mariadb
+  build: ./FreePBX-CloudMagic
+  container_name: freepbx
+  depends_on:
+   - mysql
+   - lighttpd
+   - asterisk
+  ports:
+    - "10000-20000"
+    - "80:8088:5060:5061"
+    - "19302-19309"
