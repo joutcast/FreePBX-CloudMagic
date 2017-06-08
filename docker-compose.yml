@@ -18,13 +18,12 @@ services:
    - MYSQL_DATABASE=asterisk
    - MYSQL_USER=admin
    - MYSQL_PASSWORD=passw0rd
-     lighttpd:  
+  lighttpd:  
   image: alexac/alpine-lighttpd
   container_name: lighttpd
   ports:
    - "80"
- 
-     asterisk:  
+  asterisk:  
   image: andrius/alpine-asterisk
   container_name: asterisk
   ports:
@@ -36,7 +35,6 @@ services:
   environment:
    - ASTERISK_USER=admin
    - ASTERISK_PW=passw0rd
- 
   freepbx:
   build: ./FreePBX-CloudMagic
   container_name: freepbx
