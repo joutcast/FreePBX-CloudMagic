@@ -1,4 +1,11 @@
 version: '3'
+build:
+  context: .
+  cache_from:
+    - alpine:latest
+    - wangxian/alpine-mysql
+    - alexac/alpine-lighttpd
+    - andrius/alpine-asterisk
 services:
   mysql:  
   image: wangxian/alpine-mysql
