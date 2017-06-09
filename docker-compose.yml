@@ -1,48 +1,32 @@
-version: '3'
-build:
-  context: .
-  cache_from:
-    - alpine:latest
-    - wangxian/alpine-mysql
-    - alexac/alpine-lighttpd
-    - andrius/alpine-asterisk
-services:
-  mysql:  
-  image: wangxian/alpine-mysql
-  container_name: mysql
+lighttpd:  
+  build: .
+  dockerfile: ./lighttpd/Dockerfile
+
+mysql:
+  build: .
+  dockerfile: ./mysql/Dockerfile
+  links:
+   - "lighttpd:lighttpd"
+
+asterisk:
+  build: .
+  dockerfile: ./asterisk/Dockerfile
+  links:
+   - "lighttpd:lighttpd"
+   - "mysql:mysql"
+
+freepbx:
+  build: .
+  dockerfile: ./freepbx/Dockerfile
   ports:
-   - "3306"
-  environment:
-   - MYSQL_ROOT_PASSWORD=root
-   - MYSQL_DATABASE=asteriskcddb
-   - MYSQL_DATABASE=asterisk
-   - MYSQL_USER=admin
-   - MYSQL_PASSWORD=passw0rd
-  lighttpd:  
-  image: alexac/alpine-lighttpd
-  container_name: lighttpd
-  ports:
-   - "80"
-  asterisk:  
-  image: andrius/alpine-asterisk
-  container_name: asterisk
-  ports:
-   - "3306"
-   - "80"
-   - "5060-5070"
-   - "10000-20000"
-   - "19302-19309"
-  environment:
-   - ASTERISK_USER=admin
-   - ASTERISK_PW=passw0rd
-  FreePBX-CloudMagic:
-  build: ./freepbx
-  container_name: freepbx
-  depends_on:
-   - mysql
-   - lighttpd
-   - asterisk
-  ports:
+    - "80"
+    - "3306"
+    - "5060-5070"
     - "10000-20000"
-    - "80:8088:5060:5061"
     - "19302-19309"
+    - "8088"
+    - "8080"
+  links:
+    - "lighttpd:lighttpd"
+    - "mysql:mysql"
+    - "asterisk:asterisk"
