@@ -141,8 +141,8 @@ RUN apk add --no-cache --virtual asterisk asterisk-sample-config dahdi-linux-vse
 
 ##VIRTUAL GROUP, CREATE ASTERISK-PARTS
 CMD ["asterisk-parts", "start"]
-ENTRYPOINT ["asterisk-parts"]
-CMD chkconfig asterisk-parts on
+ENTRYPOINT ["asterisk"]
+CMD chkconfig asterisk on
 
 ##VIRTUAL GROUP, CREATE WORKING DIRECTORY PBX-PARTS
 CMD mkdir /pbx-parts
@@ -169,8 +169,8 @@ RUN apk add --no-cache --virtual perl
 
 ##VIRTUAL GROUP, CREATE PBX-PARTS
 CMD ["pbx-parts", "start"]
-ENTRYPOINT ["pbx-parts"]
-CMD chkconfig pbx-parts on
+ENTRYPOINT ["fwconsole"]
+CMD chkconfig fwconsole on
 
 ##VIRTUAL GROUP, RUN INSTALLER
 CMD install_amp --virtual
@@ -221,6 +221,8 @@ CMD dumb-init lighttpd
 CMD dumb-init npm
 CMD dumb-init mysql
 CMD dumb-init asterisk
+CMD dumb-init amportal
+CMD dumb-init fwconsole
 
 ##PORTAL START
 CMD fwconsole start
