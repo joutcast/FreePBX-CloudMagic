@@ -21,6 +21,15 @@ EXPOSE 19302-19309/TCP
 ##UPDATE APK REPO
 CMD apk update
 
+##WORKINGDIR FOR THE WORLD
+WORKDIR /root
+
+##PREINSTALL APK'S FOR WORLD
+RUN apk add --no-cache dumb-init wget bash g++ make
+
+##ADD "dumb-init" TO BOOT
+CMD chkconfig dumb-init on
+
 ##VIRTUAL GROUP, CREATE WORKING DIRECTORIES OPENRC-PARTS
 CMD mkdir /openrc-parts
 WORKDIR /openrc-parts
@@ -43,12 +52,8 @@ CMD sed -i 's/cgroup_add_service /# cgroup_add_service /g' /lib/rc/sh/openrc-run
 
 ##VIRTUAL GROUP, CREATE OPENRC-PARTS
 CMD ["openrc-parts", "start"]
-ENTRYPOINT ["openrc-parts"]
-CMD chkconfig openrc-parts on
-
-##WORLD, CREATE WORKING DIR
-WORKDIR /root
-RUN apk add --no-cache wget bash g++ make
+ENTRYPOINT ["openrc"]
+CMD chkconfig openrc on
 
 ##VIRTUAL GROUP, CREATE WORKING DIRECTORY WEBCORE-PARTS
 CMD mkdir /webcore-parts
@@ -69,8 +74,8 @@ CMD rc-service lighttpd start && rc-update add lighttpd default
 
 ##VIRTUAL GROUP, CREATE WEBCORE-PARTS
 CMD ["webcore-parts", "start"]
-ENTRYPOINT ["webcore-parts"]
-CMD chkconfig webcore-parts on
+ENTRYPOINT ["lighttpd"]
+CMD chkconfig lighttpd on
 
 CMD sed -i '/^#.* include "mod_fastcgi.conf@webcore-parts" /s/^#//' /etc/lighttpd/lighttpd.conf                
 
@@ -90,8 +95,8 @@ RUN apk add --virtual mariadb-common mariadb-client mysql-client
 
 ##VIRTUAL GROUP, CREATE DATABASE-PARTS 
 CMD ["database-parts", "start"]
-CMD ["database-parts"]
-CMD chkconfig database-parts on
+ENTRYPOINT ["mysql"]
+CMD chkconfig mysql on
 
 ##VIRTUAL GROUP, CONFIGURE DATABASE-PARTS
 CMD mysql_install_db --user=mysql
@@ -123,8 +128,8 @@ CMD npm install aws-serverless-express
 
 ##VIRTUAL GROUP, CREATE NPM-PARTS
 CMD ["npm-parts", "start"]
-ENTRYPOINT ["npm-parts"]
-CMD chkconfig npm-parts on
+ENTRYPOINT ["npm"]
+CMD chkconfig npm on
 
 ##VIRTUAL GROUP, CREATE WORKING DIRECTORY ASTERISK-PARTS
 CMD mkdir /asterisk-parts
@@ -211,11 +216,11 @@ CMD echo dahdi_dummy >> /etc/modules
 CMD rm -rf /var/cache/apk/*
 
 ##ADD start.sh /root/
-CMD ["openrc-parts", "start"]
-CMD ["webcore-parts", "start"]
-CMD ["database-parts", "start"]
-CMD ["npm-parts", "start"]
-CMD ["asterisk-parts", "start"]
+dumb-init openrc
+dumb-init lighttpd
+dumb-init npm
+dumb-init mysql
+dumb-init asterisk
 
 ##PORTAL START
 CMD fwconsole start
