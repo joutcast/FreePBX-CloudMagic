@@ -168,16 +168,11 @@ RUN apk add --no-cache --virtual sed-patch
 RUN apk add --no-cache --virtual perl
 
 ##VIRTUAL GROUP, CREATE PBX-PARTS
-CMD ["pbx-parts", "start"]
-ENTRYPOINT ["fwconsole"]
-CMD chkconfig fwconsole on
+##CMD ["pbx-parts", "start"]
 
 ##VIRTUAL GROUP, RUN INSTALLER
 CMD install_amp --virtual
 
-##FINAL VIRTUAL GROUP
-##CMD ["pbx-parts", "start"]
-##ENTRYPOINT ["pbx-parts"]
 
 ##CHANGE GROUPNAME & USERNAME 'lighttpd' TO 'asterisk'
 CMD groupmod --new-name asterisk lighttpd
@@ -196,6 +191,9 @@ CMD cd /var/www/localhost/htdocs/freepbx/admin/modules/framework/bin/
 CMD patch -p0 freepbx_engine.patch
 
 
+##FINAL VIRTUAL GROUP
+CMD ["pbx-parts", "start"]
+ENTRYPOINT ["amportal", "fwconsole"]
 
 ##DOWNLOAD & INSTALL AWS ELASTICACHE
 ##RUN /bin/sh wget https://elasticache-downloads.s3.amazonaws.com/ClusterClient/PHP-7.0/latest-64bit
