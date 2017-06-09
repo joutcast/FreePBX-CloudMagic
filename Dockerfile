@@ -216,11 +216,11 @@ CMD echo dahdi_dummy >> /etc/modules
 CMD rm -rf /var/cache/apk/*
 
 ##ADD start.sh /root/
-dumb-init openrc
-dumb-init lighttpd
-dumb-init npm
-dumb-init mysql
-dumb-init asterisk
+CMD dumb-init openrc
+CMD dumb-init lighttpd
+CMD dumb-init npm
+CMD dumb-init mysql
+CMD dumb-init asterisk
 
 ##PORTAL START
 CMD fwconsole start
